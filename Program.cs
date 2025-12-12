@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Добавьте строку подключения к PostgreSQL
-var connectionString = "Host=localhost;Port=5432;Database=nodedemo;Username=postgres;Password=1";
+var connectionString = "Host=localhost;Port=5432;Database=catatonia;Username=postgres;Password=1";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseNpgsql(connectionString));
@@ -36,7 +37,7 @@ app.UseStaticFiles();  // Отдача статических файлов (CSS,
 
 app.MapPost("/getdb", async (ApplicationDbContext db, HttpContext context) => 
 {
-    var request = context.Request.ReadFromJsonAsync<RequestModel>().Result;
+    var request = await context.Request.ReadFromJsonAsync<RequestModel>();
     // Данные уже автоматически десериализованы
     string? did = request.did;
     string? time_fishing = request.time_fishing;
@@ -50,17 +51,21 @@ app.MapPost("/getdb", async (ApplicationDbContext db, HttpContext context) =>
         if (!canConnect)
             return Results.Problem("Не удалось подключиться к базе данных", statusCode: 500);
 
-        // Получаем все фильмы (только поле Title)
-        var films = await db.films
-            .OrderBy(f => f.id)
-            .Select(f => new { f.did, f.time_fishing })
-            .FirstOrDefaultAsync();
+        var result = await db.field_elem
+            .Where(fe => fe.field_id == 2)
+            .Select(fe => new
+            {
+                fe.elem.elem_name,
+                fe.x,
+                fe.y
+            })
+            .ToListAsync();
 
         // Возвращаем как JSON
         var response = new {
             time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.000Z"),
             status = "ok",
-            received = films
+            received = result
         };
 
         return Results.Ok(response);
@@ -83,22 +88,36 @@ app.MapFallbackToFile("index.html");
 
 app.Run();
 
-// ... остальной код ...
 
 public class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+    
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
 
-    // Пример таблицы: если у вас есть таблица "Items"
-    public DbSet<Film> films { get; set; }
-}
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Настройка связей между таблицами
+        modelBuilder.Entity<Field_elem>()
+            .HasKey(fe => new { fe.field_id, fe.elem_id });
 
-public class Film
-{
-    public int id { get; set; }
-    public string title { get; set; }
-    public int? did { get; set; }
-    public DateTime? time_fishing { get; set; }
+        modelBuilder.Entity<Field_elem>()
+            .HasOne(fe => fe.field)
+            .WithMany(f => f.field_elems)
+            .HasForeignKey(fe => fe.field_id);
+
+        modelBuilder.Entity<Field_elem>()
+            .HasOne(fe => fe.elem)
+            .WithMany(e => e.field_elems)
+            .HasForeignKey(fe => fe.elem_id);
+
+        // Можно добавить другие настройки...
+    }
+
+    public DbSet<Elem> elem { get; set; }
+    public DbSet<Field> field { get; set; }
+    public DbSet<Field_elem> field_elem { get; set; }
 }
 
 // RequestModel.cs
@@ -107,3 +126,32 @@ public class RequestModel
     public string? did { get; set; }
     public string? time_fishing { get; set; }
 }
+public class Elem
+{
+    [Key]
+    public int elem_id { get; set; }
+    public required string elem_name { get; set; }
+    public ICollection<Field_elem> field_elems { get; set; }
+}
+public class Field
+{
+    [Key]
+    public int field_id { get; set; }
+    public required string field_name { get; set; }
+    public ICollection<Field_elem> field_elems { get; set; }
+}
+public class Field_elem
+{
+    [Key]
+    public int field_elem_id { get; set; }
+    public required int elem_id { get; set; }
+    public required int field_id { get; set; }
+    public required int x { get; set; }
+    public required int y { get; set; }
+    public required int field_order { get; set; }
+
+    // Навигационные свойства
+    public required Field field { get; set; }
+    public required Elem elem { get; set; }
+}
+
