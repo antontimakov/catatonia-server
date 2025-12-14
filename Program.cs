@@ -75,6 +75,43 @@ app.MapPost("/getdb", async (ApplicationDbContext db, HttpContext context) =>
         return Results.Problem($"Ошибка: {ex.Message}", statusCode: 500);
     }
 });
+app.MapPost("/setdb", async (ApplicationDbContext db, HttpContext context) =>
+{
+    // Читаем и десериализуем JSON
+    var request = await context.Request.ReadFromJsonAsync<SetDbRequest>();
+    if (request == null){
+        return Results.BadRequest("Некорректные данные");
+    }
+    Console.WriteLine($"x={request.elem_id}");
+
+    try
+    {
+        // Находим запись в field_elem по координатам x и y
+        var fieldElem = await db.field_elem
+            .FirstOrDefaultAsync(fe => fe.x == request.x && fe.y == request.y);
+
+        if (fieldElem == null)
+            return Results.NotFound($"Элемент с координатами ({request.x}, {request.y}) не найден");
+
+        // Обновляем elem_id
+        fieldElem.elem_id = request.elem_id;
+
+        // Сохраняем изменения в БД
+        await db.SaveChangesAsync();
+
+        return Results.Ok(new
+        {
+            message = "Обновлено успешно",
+            updated = new { request.x, request.y, request.elem_id }
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Ошибка при обновлении: {ex.Message}", statusCode: 500);
+        Console.WriteLine("Ошибка в /setdb: " + ex);
+    }
+});
+
 
 
 // Включаем просмотр директорий (только для разработки!)
@@ -91,6 +128,9 @@ app.Run();
 
 public class ApplicationDbContext : DbContext
 {
+    public DbSet<Elem> elem { get; set; }
+    public DbSet<Field> field { get; set; }
+    public DbSet<Field_elem> field_elem { get; set; }
     
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -99,8 +139,8 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Настройка связей между таблицами
-        modelBuilder.Entity<Field_elem>()
-            .HasKey(fe => new { fe.field_id, fe.elem_id });
+        //modelBuilder.Entity<Field_elem>()
+        //    .HasKey(fe => new { fe.field_id, fe.elem_id, fe.x, fe.y, fe.field_order});
 
         modelBuilder.Entity<Field_elem>()
             .HasOne(fe => fe.field)
@@ -111,13 +151,7 @@ public class ApplicationDbContext : DbContext
             .HasOne(fe => fe.elem)
             .WithMany(e => e.field_elems)
             .HasForeignKey(fe => fe.elem_id);
-
-        // Можно добавить другие настройки...
     }
-
-    public DbSet<Elem> elem { get; set; }
-    public DbSet<Field> field { get; set; }
-    public DbSet<Field_elem> field_elem { get; set; }
 }
 
 // RequestModel.cs
@@ -153,5 +187,12 @@ public class Field_elem
     // Навигационные свойства
     public required Field field { get; set; }
     public required Elem elem { get; set; }
+}
+public class SetDbRequest
+{
+    public int elem_id { get; set; }
+    public string? elem_name { get; set; } // может не использоваться
+    public int x { get; set; }
+    public int y { get; set; }
 }
 
