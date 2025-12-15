@@ -7,8 +7,8 @@ using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавьте строку подключения к PostgreSQL
-var connectionString = "Host=localhost;Port=5432;Database=catatonia;Username=postgres;Password=1";
+// Считываем строку подключения из appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseNpgsql(connectionString));
@@ -37,7 +37,12 @@ app.UseStaticFiles();  // Отдача статических файлов (CSS,
 
 app.MapPost("/getdb", async (ApplicationDbContext db, HttpContext context) => 
 {
-    var request = await context.Request.ReadFromJsonAsync<RequestModel>();
+    RequestModel? request = await context.Request.ReadFromJsonAsync<RequestModel>();
+
+    if (request == null)
+    {
+        return Results.BadRequest("Не удалось прочитать данные");
+    }
     // Данные уже автоматически десериализованы
     string? did = request.did;
     string? time_fishing = request.time_fishing;
@@ -107,8 +112,8 @@ app.MapPost("/setdb", async (ApplicationDbContext db, HttpContext context) =>
     }
     catch (Exception ex)
     {
-        return Results.Problem($"Ошибка при обновлении: {ex.Message}", statusCode: 500);
         Console.WriteLine("Ошибка в /setdb: " + ex);
+        return Results.Problem($"Ошибка при обновлении: {ex.Message}", statusCode: 500);
     }
 });
 
@@ -165,14 +170,14 @@ public class Elem
     [Key]
     public int elem_id { get; set; }
     public required string elem_name { get; set; }
-    public ICollection<Field_elem> field_elems { get; set; }
+    public ICollection<Field_elem>? field_elems { get; set; }
 }
 public class Field
 {
     [Key]
     public int field_id { get; set; }
     public required string field_name { get; set; }
-    public ICollection<Field_elem> field_elems { get; set; }
+    public ICollection<Field_elem>? field_elems { get; set; }
 }
 public class Field_elem
 {
