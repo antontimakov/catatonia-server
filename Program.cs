@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 //using System.ComponentModel.DataAnnotations;
+using CatatoniaServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
+// Регистрируем сервис
+builder.Services.AddScoped<FillFieldService>();
 
 // Добавляем Swagger (только для разработки)
 builder.Services.AddEndpointsApiExplorer();

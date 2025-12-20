@@ -12,42 +12,22 @@ namespace CatatoniaServer.Controllers
     [Route("api/[controller]")]
     public class DataController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
+        private readonly FillFieldService _fillFieldService;
 
-        public DataController(ApplicationDbContext db)
+        public DataController(FillFieldService fillFieldService)
         {
-            _db = db;
+            _fillFieldService = fillFieldService;
         }
 
         // POST api/data/getdb
         [HttpPost("getdb")]
         public async Task<IActionResult> GetDb([FromBody] RequestModel request)
         {
-            if (request == null)
-                return BadRequest("Некорректные данные");
-
-            string? did = request.did;
-            string? time_fishing = request.time_fishing;
-
-            Console.WriteLine($"Получено: Id={did}, Action={time_fishing}");
             try
             {
-                List<FillFieldResult> result = await _db.field_elem
-                    .Where(fe => fe.field_id == 2)
-                    .Select(fe => new FillFieldResult
-                    {
-                        elem_name = fe.elem.elem_name,
-                        x = fe.x,
-                        y = fe.y
-                    })
-                    .ToListAsync();
-
-                return Ok(new MainResult<FillFieldResult>
-                {
-                    time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.000Z"),
-                    status = "ok",
-                    received = result
-                });
+                // Вызываем сервис
+                var result = await _fillFieldService.index();
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -56,7 +36,7 @@ namespace CatatoniaServer.Controllers
         }
 
         // POST api/data/setdb
-        [HttpPost("setdb")]
+        /*[HttpPost("setdb")]
         public async Task<IActionResult> SetDb([FromBody] SetDbRequest request)
         {
             if (request == null)
@@ -83,6 +63,6 @@ namespace CatatoniaServer.Controllers
             {
                 return Problem($"Ошибка: {ex.Message}", statusCode: 500);
             }
-        }
+        }*/
     }
 }
