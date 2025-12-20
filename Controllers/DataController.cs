@@ -3,6 +3,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CatatoniaServer.Models;
+using CatatoniaServer.Services;
+using CatatoniaServer.Result;
 
 namespace CatatoniaServer.Controllers
 {
@@ -30,17 +32,17 @@ namespace CatatoniaServer.Controllers
             Console.WriteLine($"Получено: Id={did}, Action={time_fishing}");
             try
             {
-                var result = await _db.field_elem
+                List<FillFieldResult> result = await _db.field_elem
                     .Where(fe => fe.field_id == 2)
-                    .Select(fe => new
+                    .Select(fe => new FillFieldResult
                     {
-                        fe.elem.elem_name,
-                        fe.x,
-                        fe.y
+                        elem_name = fe.elem.elem_name,
+                        x = fe.x,
+                        y = fe.y
                     })
                     .ToListAsync();
 
-                return Ok(new
+                return Ok(new MainResult<FillFieldResult>
                 {
                     time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.000Z"),
                     status = "ok",
