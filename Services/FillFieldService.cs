@@ -1,28 +1,22 @@
 // Services/FillFieldService.cs
 
-using CatatoniaServer.Result;
 using Microsoft.EntityFrameworkCore;
+using CatatoniaServer.Result;
+using CatatoniaServer.Repositories;
 
 namespace CatatoniaServer.Services
 {
     public class FillFieldService
     {
-        private readonly ApplicationDbContext _db;
+        private readonly FillFieldRepository _fillFieldRepository;
 
-        public FillFieldService(ApplicationDbContext db)
+        public FillFieldService(FillFieldRepository fillFieldRepository)
         {
-            _db = db;
+            _fillFieldRepository = fillFieldRepository;
         }
         public async Task<MainResult<FillFieldResult>> index(){
-            List<FillFieldResult> result = await _db.field_elem
-                .Where(fe => fe.field_id == 2)
-                .Select(fe => new FillFieldResult
-                {
-                    elem_name = fe.elem.elem_name,
-                    x = fe.x,
-                    y = fe.y
-                })
-                .ToListAsync();
+
+            var result = await _fillFieldRepository.index();
 
             return new MainResult<FillFieldResult>
             {

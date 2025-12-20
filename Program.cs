@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 //using System.ComponentModel.DataAnnotations;
 using CatatoniaServer.Services;
+using CatatoniaServer.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 // Регистрируем сервис
 builder.Services.AddScoped<FillFieldService>();
+// Регистрируем репозиторий
+builder.Services.AddScoped<FillFieldRepository>();
 
 // Добавляем Swagger (только для разработки)
 builder.Services.AddEndpointsApiExplorer();
