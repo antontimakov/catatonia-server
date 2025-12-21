@@ -8,22 +8,15 @@ namespace CatatoniaServer.Services
 {
     public class FillFieldService
     {
-        private readonly FillFieldRepository _fillFieldRepository;
+        private readonly FillFieldRepository fillFieldRepository;
 
-        public FillFieldService(FillFieldRepository fillFieldRepository)
+        public FillFieldService(FillFieldRepository fillFieldRepositoryPar)
         {
-            _fillFieldRepository = fillFieldRepository;
+            fillFieldRepository = fillFieldRepositoryPar;
         }
-        public async Task<MainResult<FillFieldResult>> index(){
+        public async Task<List<FillFieldResult>> index(){
 
-            var result = await _fillFieldRepository.index();
-
-            return new MainResult<FillFieldResult>
-            {
-                time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.000Z"),
-                status = "ok",
-                received = result
-            };
+            return await fillFieldRepository.index();
         }
     }
 }

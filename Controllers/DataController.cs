@@ -12,11 +12,11 @@ namespace CatatoniaServer.Controllers
     [Route("api/[controller]")]
     public class DataController : ControllerBase
     {
-        private readonly FillFieldService _fillFieldService;
+        private readonly FillFieldService fillFieldService;
 
-        public DataController(FillFieldService fillFieldService)
+        public DataController(FillFieldService fillFieldServicePar)
         {
-            _fillFieldService = fillFieldService;
+            fillFieldService = fillFieldServicePar;
         }
 
         // POST api/data/getdb
@@ -25,9 +25,9 @@ namespace CatatoniaServer.Controllers
         {
             try
             {
-                // Вызываем сервис
-                var result = await _fillFieldService.index();
-                return Ok(result);
+                List<FillFieldResult> result = await fillFieldService.index();
+
+                return Ok(new MainResult<FillFieldResult>(result));
             }
             catch (Exception ex)
             {

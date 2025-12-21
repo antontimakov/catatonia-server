@@ -7,14 +7,14 @@ namespace CatatoniaServer.Repositories
 {
     public class FillFieldRepository
     {
-        private readonly ApplicationDbContext _db;
+        private readonly ApplicationDbContext db;
 
-        public FillFieldRepository(ApplicationDbContext db)
+        public FillFieldRepository(ApplicationDbContext dbPar)
         {
-            _db = db;
+            db = dbPar;
         }
         public async Task<List<FillFieldResult>> index(){
-            return await _db.field_elem
+            return await db.field_elem
                 .Where(fe => fe.field_id == 2)
                 .Select(fe => new FillFieldResult
                 {
