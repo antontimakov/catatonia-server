@@ -2,6 +2,7 @@
 
 using CatatoniaServer.Result;
 using Microsoft.EntityFrameworkCore;
+using CatatoniaServer.Requests;
 
 namespace CatatoniaServer.Repositories
 {
@@ -23,6 +24,17 @@ namespace CatatoniaServer.Repositories
                     y = fe.y
                 })
                 .ToListAsync();
+        }
+        public async void update(FillFieldRequest request){
+            var fieldElem = await db.field_elem
+                    .FirstOrDefaultAsync(fe => fe.x == request.x && fe.y == request.y);
+
+            if (fieldElem == null){
+                throw new KeyNotFoundException($"Элемент с координатами ({request.x}, {request.y}) не найден");
+            }
+
+            fieldElem.elem_id = request.elem_id;
+            await db.SaveChangesAsync();
         }
     }
 }

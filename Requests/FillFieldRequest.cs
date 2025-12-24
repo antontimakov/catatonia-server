@@ -1,9 +1,8 @@
-// Models/SetDbRequest.cs
-using System.ComponentModel.DataAnnotations;
+// Requests/FillFieldRequest.cs
 
-namespace CatatoniaServer.Models
+namespace CatatoniaServer.Requests
 {
-    public class SetDbRequest
+    public class FillFieldRequest
     {
         public int elem_id { get; set; }
         public string? elem_name { get; set; }
