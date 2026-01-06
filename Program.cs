@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 //using System.ComponentModel.DataAnnotations;
-using CatatoniaServer.Services;
-using CatatoniaServer.Repositories;
+using CatatoniaServer.Modules.MainField.Services;
+using CatatoniaServer.Modules.MainField.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

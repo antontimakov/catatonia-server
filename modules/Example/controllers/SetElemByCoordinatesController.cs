@@ -1,6 +1,6 @@
 // Controllers/SetElemByCoordinatesController.cs
 
-using Microsoft.AspNetCore.Mvc;
+/*using Microsoft.AspNetCore.Mvc;
 using CatatoniaServer.Services;
 using CatatoniaServer.Result;
 using CatatoniaServer.Requests;
@@ -31,4 +31,4 @@ namespace CatatoniaServer.Controllers
             }
         }
     }
-}
+}*/

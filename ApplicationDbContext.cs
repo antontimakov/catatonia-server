@@ -1,5 +1,5 @@
 //ApplicationDbContext.cs
-using CatatoniaServer.Models;
+using CatatoniaServer.Modules.MainField.Models;
 using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext

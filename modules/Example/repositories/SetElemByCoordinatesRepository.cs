@@ -1,6 +1,6 @@
 // Repositories/SetElemByCoordinatesRepository.cs
 
-using CatatoniaServer.Result;
+/*using CatatoniaServer.Result;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatatoniaServer.Repositories
@@ -25,4 +25,4 @@ namespace CatatoniaServer.Repositories
                 .ToListAsync();
         }
     }
-}
+}*/

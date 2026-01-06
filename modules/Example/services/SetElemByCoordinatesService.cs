@@ -1,6 +1,6 @@
 // Services/SetElemByCoordinatesService.cs
 
-using CatatoniaServer.Result;
+/*using CatatoniaServer.Result;
 using CatatoniaServer.Repositories;
 
 namespace CatatoniaServer.Services
@@ -18,4 +18,4 @@ namespace CatatoniaServer.Services
             return await setElemByCoordinatesRepository.index();
         }
     }
-}
+}*/
