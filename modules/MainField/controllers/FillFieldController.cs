@@ -50,7 +50,7 @@ public class FillFieldController : ControllerBase
 
         try
         {
-            fillFieldService.update(request);
+            await fillFieldService.update(request);
             return Ok(new CatatoniaServer.Modules.Common.Result.EmptyResult());
         }
         catch (KeyNotFoundException ex)

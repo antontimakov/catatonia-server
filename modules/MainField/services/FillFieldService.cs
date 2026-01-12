@@ -16,7 +16,7 @@ public class FillFieldService
     public async Task<List<FillFieldDbr>> index(){
         return await fillFieldRepository.index();
     }
-    public void update(FillFieldRequest request){
-        fillFieldRepository.update(request);
+    public async Task<int> update(FillFieldRequest request){
+        return await fillFieldRepository.update(request);
     }
 }

@@ -24,7 +24,7 @@ public class FillFieldRepository
             })
             .ToListAsync();
     }
-    public async void update(FillFieldRequest request){
+    public async Task<int> update(FillFieldRequest request){
         var fieldElem = await db.field_elem
                 .FirstOrDefaultAsync(fe => fe.x == request.x && fe.y == request.y);
 
@@ -33,6 +33,6 @@ public class FillFieldRepository
         }
 
         fieldElem.elem_id = request.elem_id;
-        await db.SaveChangesAsync();
+        return await db.SaveChangesAsync();
     }
 }
