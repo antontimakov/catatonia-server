@@ -18,9 +18,12 @@ public class FillFieldRepository
             .Where(fe => fe.field_id == 2)
             .Select(fe => new FillFieldDbr
             {
+                elem_id = fe.elem_id,
                 elem_name = fe.elem.elem_name,
                 x = fe.x,
-                y = fe.y
+                y = fe.y,
+                elem_plantable = fe.elem.elem_plantable,
+                elem_harvestable = fe.elem.elem_harvestable
             })
             .ToListAsync();
     }
