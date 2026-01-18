@@ -9,5 +9,6 @@ public class Elem
     public required string elem_name { get; set; }
     public required bool elem_plantable { get; set; }
     public required bool elem_harvestable { get; set; }
+    public required bool elem_weed { get; set; }
     public ICollection<FieldElem>? field_elems { get; set; }
 }
