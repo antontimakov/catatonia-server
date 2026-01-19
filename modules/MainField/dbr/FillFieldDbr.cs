@@ -11,4 +11,6 @@ public class FillFieldDbr
     public required bool elem_plantable { get; set; }
     public required bool elem_harvestable { get; set; }
     public required bool elem_weed { get; set; }
+    public required int elem_lifetime { get; set; }
+    public required DateTime updated { get; set; }
 }

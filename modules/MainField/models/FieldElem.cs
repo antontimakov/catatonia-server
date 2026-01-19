@@ -11,6 +11,7 @@ public class FieldElem
     public required int x { get; set; }
     public required int y { get; set; }
     public required int field_order { get; set; }
+    public required DateTime updated { get; set; }
 
     // Навигационные свойства
     public required Field field { get; set; }
