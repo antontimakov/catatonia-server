@@ -1,8 +1,8 @@
-// Models/FieldElem.cs
+// Models/FieldElemModel.cs
 using System.ComponentModel.DataAnnotations;
 
 namespace CatatoniaServer.Modules.MainField.Models;
-public class FieldElem
+public class FieldElemModel
 {
     [Key]
     public int field_elem_id { get; set; }
@@ -14,6 +14,6 @@ public class FieldElem
     public required DateTime updated { get; set; }
 
     // Навигационные свойства
-    public required Field field { get; set; }
-    public required Elem elem { get; set; }
+    public required FieldModel field { get; set; }
+    public required ElemModel elem { get; set; }
 }

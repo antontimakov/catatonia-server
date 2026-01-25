@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext
 {
-    public DbSet<Elem> elem { get; set; }
-    public DbSet<Field> field { get; set; }
-    public DbSet<FieldElem> field_elem { get; set; }
+    public DbSet<ElemModel> elem { get; set; }
+    public DbSet<FieldModel> field { get; set; }
+    public DbSet<FieldElemModel> field_elem { get; set; }
+    public DbSet<UserModel> user { get; set; }
     
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -18,12 +19,12 @@ public class ApplicationDbContext : DbContext
         //modelBuilder.Entity<Field_elem>()
         //    .HasKey(fe => new { fe.field_id, fe.elem_id, fe.x, fe.y, fe.field_order});
 
-        modelBuilder.Entity<FieldElem>()
+        modelBuilder.Entity<FieldElemModel>()
             .HasOne(fe => fe.field)
             .WithMany(f => f.field_elems)
             .HasForeignKey(fe => fe.field_id);
 
-        modelBuilder.Entity<FieldElem>()
+        modelBuilder.Entity<FieldElemModel>()
             .HasOne(fe => fe.elem)
             .WithMany(e => e.field_elems)
             .HasForeignKey(fe => fe.elem_id);

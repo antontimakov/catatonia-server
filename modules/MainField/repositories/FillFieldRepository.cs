@@ -3,6 +3,7 @@
 using CatatoniaServer.Modules.MainField.Dbr;
 using Microsoft.EntityFrameworkCore;
 using CatatoniaServer.Modules.MainField.Requests;
+using CatatoniaServer.Modules.MainField.Models;
 
 namespace CatatoniaServer.Modules.MainField.Repositories;
 public class FillFieldRepository
@@ -13,7 +14,11 @@ public class FillFieldRepository
     {
         db = dbPar;
     }
-    public async Task<List<FillFieldDbr>> index(){
+    /// <summary>
+    /// Выберает все элементы поля
+    /// </summary>
+    /// <returns></returns>
+    public async Task<List<FillFieldDbr>> Index(){
         return await db.field_elem
             // TODO вынести в константу
             .Where(fe => fe.field_id == 2)
@@ -29,6 +34,25 @@ public class FillFieldRepository
                 elem_weed = fe.elem.elem_weed,
                 elem_lifetime = fe.elem.elem_lifetime,
                 updated = fe.updated
+            })
+            .ToListAsync();
+    }
+    /// <summary>
+    /// Выберает информацию обо всех элементах
+    /// </summary>
+    /// <returns></returns>
+    public async Task<List<ElemModel>> AllElems(){
+        return await db.elem
+            // TODO вынести в константу
+            .Select(e => new ElemModel
+            {
+                elem_id = e.elem_id,
+                elem_name = e.elem_name,
+                elem_plantable = e.elem_plantable,
+                elem_harvestable = e.elem_harvestable,
+                elem_weed = e.elem_weed,
+                elem_lifetime = e.elem_lifetime,
+                elem_cost = e.elem_cost
             })
             .ToListAsync();
     }

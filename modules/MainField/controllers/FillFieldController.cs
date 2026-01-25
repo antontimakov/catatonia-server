@@ -2,9 +2,9 @@
 
 using Microsoft.AspNetCore.Mvc;
 using CatatoniaServer.Modules.MainField.Services;
-using CatatoniaServer.Modules.MainField.Dbr;
 using CatatoniaServer.Modules.MainField.Requests;
 using CatatoniaServer.Modules.Common.Result;
+using CatatoniaServer.Modules.MainField.Dto;
 
 namespace CatatoniaServer.Modules.MainField.Controllers;
 [ApiController]
@@ -20,15 +20,15 @@ public class FillFieldController : ControllerBase
 
     // POST api/FillField/index
     [HttpPost("index")]
-    public async Task<IActionResult> index()
+    public async Task<IActionResult> Index()
     {
         try
         {
-            List<FillFieldDbr> result = await fillFieldService.index();
+            StartDto result = await fillFieldService.Index();
 
-            return Ok(new MainResult<FillFieldDbr>
+            return Ok(new MainResult<StartDto>
             {
-                received = result
+                Received = result
             });
         }
         catch (Exception ex)

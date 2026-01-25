@@ -1,8 +1,8 @@
-// modules/MainField/models/Elem.cs
+// modules/MainField/models/ElemModel.cs
 using System.ComponentModel.DataAnnotations;
 
 namespace CatatoniaServer.Modules.MainField.Models;
-public class Elem
+public class ElemModel
 {
     [Key]
     public int elem_id { get; set; }
@@ -11,5 +11,6 @@ public class Elem
     public required bool elem_harvestable { get; set; }
     public required bool elem_weed { get; set; }
     public required int elem_lifetime { get; set; }
-    public ICollection<FieldElem>? field_elems { get; set; }
+    public required int elem_cost { get; set; }
+    public ICollection<FieldElemModel>? field_elems { get; set; }
 }

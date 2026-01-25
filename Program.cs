@@ -16,8 +16,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 // Регистрируем сервис
 builder.Services.AddScoped<FillFieldService>();
-// Регистрируем репозиторий
+// Регистрируем репозитории
 builder.Services.AddScoped<FillFieldRepository>();
+builder.Services.AddScoped<UserRepository>();
 
 // Добавляем Swagger (только для разработки)
 builder.Services.AddEndpointsApiExplorer();
