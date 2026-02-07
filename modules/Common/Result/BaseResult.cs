@@ -1,14 +1,17 @@
 // modules/Common/Result/BaseResult.cs
+using System.Text.Json.Serialization;
 
 namespace CatatoniaServer.Modules.Common.Result;
 public abstract class BaseResult
 {
-    public string time { get; set; }
-    public string status { get; set; }
+    [JsonPropertyName("Time")]
+    public string Time { get; set; }
+    [JsonPropertyName("Status")]
+    public string Status { get; set; }
 
     public BaseResult()
     {
-        time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.000Z");
-        status = "ok";
+        Time = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.000Z");
+        Status = "ok";
     }
 }

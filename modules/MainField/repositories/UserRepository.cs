@@ -17,14 +17,14 @@ public class UserRepository
     /// </summary>
     /// <returns></returns>
     public async Task<List<UserModel>> Index(int? id = null){
-        IQueryable<UserModel> query = db.user.AsQueryable();
+        IQueryable<UserModel> query = db.User.AsQueryable();
         if (id != null){
-            query = query.Where(u => u.UserId == id);
+            query = query.Where(u => u.Id == id);
         }
         return await query
             .Select(u => new UserModel
             {
-                UserId = u.UserId,
+                Id = u.Id,
                 Gold = u.Gold
             })
             .ToListAsync();

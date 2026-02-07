@@ -19,21 +19,21 @@ public class FillFieldRepository
     /// </summary>
     /// <returns></returns>
     public async Task<List<FillFieldDbr>> Index(){
-        return await db.field_elem
+        return await db.FieldElem
             // TODO вынести в константу
-            .Where(fe => fe.field_id == 2)
+            .Where(fe => fe.FieldId == 2)
             .Select(fe => new FillFieldDbr
             {
-                field_elem_id = fe.field_elem_id,
-                elem_id = fe.elem_id,
-                elem_name = fe.elem.elem_name,
-                x = fe.x,
-                y = fe.y,
-                elem_plantable = fe.elem.elem_plantable,
-                elem_harvestable = fe.elem.elem_harvestable,
-                elem_weed = fe.elem.elem_weed,
-                elem_lifetime = fe.elem.elem_lifetime,
-                updated = fe.updated
+                FieldElemId = fe.Id,
+                ElemId = fe.ElemId,
+                Name = fe.Elem.Name,
+                X = fe.X,
+                Y = fe.Y,
+                IsPlantable = fe.Elem.IsPlantable,
+                IsHarvestable = fe.Elem.IsHarvestable,
+                IsWeed = fe.Elem.IsWeed,
+                Lifetime = fe.Elem.Lifetime,
+                UpdatedAt = fe.UpdatedAt
             })
             .ToListAsync();
     }
@@ -42,105 +42,112 @@ public class FillFieldRepository
     /// </summary>
     /// <returns></returns>
     public async Task<List<ElemModel>> AllElems(){
-        return await db.elem
+        return await db.Elem
             // TODO вынести в константу
             .Select(e => new ElemModel
             {
-                elem_id = e.elem_id,
-                elem_name = e.elem_name,
-                elem_plantable = e.elem_plantable,
-                elem_harvestable = e.elem_harvestable,
-                elem_weed = e.elem_weed,
-                elem_lifetime = e.elem_lifetime,
-                elem_cost = e.elem_cost
+                Id = e.Id,
+                Name = e.Name,
+                IsPlantable = e.IsPlantable,
+                IsHarvestable = e.IsHarvestable,
+                IsWeed = e.IsWeed,
+                Lifetime = e.Lifetime,
+                Cost = e.Cost
             })
             .ToListAsync();
     }
     public async Task<int> update(FillFieldRequest request){
         // TODO убрать анонимный объект
-        var fieldElem = await db.field_elem
-            .Where(fe => fe.x == request.x && fe.y == request.y)
+        var fieldElem = await db.FieldElem
+            .Where(fe => fe.X == request.X && fe.Y == request.Y)
             .Select(fe => new
             {
-                field_elem_id = fe.field_elem_id,
-                elem_id = fe.elem_id,
-                elem_plantable = fe.elem.elem_plantable,
-                elem_harvestable = fe.elem.elem_harvestable,
-                elem_weed = fe.elem.elem_weed
+                FieldElemId = fe.Id,
+                ElemId = fe.ElemId,
+                IsPlantable = fe.Elem.IsPlantable,
+                IsHarvestable = fe.Elem.IsHarvestable,
+                IsWeed = fe.Elem.IsWeed
             })
             .FirstOrDefaultAsync();
 
         if (fieldElem == null){
-            throw new KeyNotFoundException($"Элемент с координатами ({request.x}, {request.y}) не найден");
+            throw new KeyNotFoundException($"Элемент с координатами ({request.X}, {request.Y}) не найден");
         }
         // TODO вынести логику в сервис
-        if (fieldElem.elem_weed){
-            var fieldElemUpdate = await db.field_elem
-                .FirstOrDefaultAsync(fe => fe.field_elem_id == fieldElem.field_elem_id);
+        if (fieldElem.IsWeed){
+            var fieldElemUpdate = await db.FieldElem
+                .FirstOrDefaultAsync(fe => fe.Id == fieldElem.FieldElemId);
 
             if (fieldElemUpdate == null){
                 throw new KeyNotFoundException($"Не найден элемент");
             }
             // TODO убрать анонимный объект
-            var newElem = await db.elem
-                .Where(e => e.elem_name == "ground")
+            var newElem = await db.Elem
+                .Where(e => e.Name == "ground")
                 .Select(e => new
                 {
-                    elem_id = e.elem_id
+                    Id = e.Id
                 })
                 .FirstOrDefaultAsync();
 
             if (newElem == null){
                 throw new KeyNotFoundException($"Не найден элемент");
             }
-            fieldElemUpdate.elem_id = newElem.elem_id;
+            fieldElemUpdate.ElemId = newElem.Id;
             return await db.SaveChangesAsync();
         }
-        else if (fieldElem.elem_plantable)
+        else if (fieldElem.IsPlantable)
         {
-            var fieldElemUpdate = await db.field_elem
-                .FirstOrDefaultAsync(fe => fe.field_elem_id == fieldElem.field_elem_id);
+            var fieldElemUpdate = await db.FieldElem
+                .FirstOrDefaultAsync(fe => fe.Id == fieldElem.FieldElemId);
 
             if (fieldElemUpdate == null){
                 throw new KeyNotFoundException($"Не найден элемент");
             }
             // TODO убрать анонимный объект
-            var newElem = await db.elem
-                .Where(e => e.elem_name == request.new_elem_name)
+            var newElem = await db.Elem
+                .Where(e => e.Name == request.NewElemName)
                 .Select(e => new
                 {
-                    elem_id = e.elem_id
+                    Id = e.Id
                 })
                 .FirstOrDefaultAsync();
 
             if (newElem == null){
                 throw new KeyNotFoundException($"Не найден элемент");
             }
-            fieldElemUpdate.elem_id = newElem.elem_id;
-            fieldElemUpdate.updated = DateTime.UtcNow;
+            fieldElemUpdate.ElemId = newElem.Id;
+            fieldElemUpdate.UpdatedAt = DateTime.UtcNow;
             return await db.SaveChangesAsync();
         }
-        else if (fieldElem.elem_harvestable)
+        else if (fieldElem.IsHarvestable)
         {
-            var fieldElemUpdate = await db.field_elem
-                .FirstOrDefaultAsync(fe => fe.field_elem_id == fieldElem.field_elem_id);
-
+            var fieldElemUpdate = await db.FieldElem
+                .Include(fe => fe.Elem)
+                .FirstOrDefaultAsync(fe => fe.Id == fieldElem.FieldElemId);
             if (fieldElemUpdate == null){
                 throw new KeyNotFoundException($"Не найден элемент");
             }
+            var userUpdate = await db.User
+                .FirstOrDefaultAsync(e => e.Id == 1);
+            if (userUpdate == null){
+                throw new KeyNotFoundException($"Не найден пользователь");
+            }
             // TODO убрать анонимный объект
-            var newElem = await db.elem
-                .Where(e => e.elem_name == "grass")
+            var newElem = await db.Elem
+                .Where(e => e.Name == "grass")
                 .Select(e => new
                 {
-                    elem_id = e.elem_id
+                    Id = e.Id
                 })
                 .FirstOrDefaultAsync();
 
             if (newElem == null){
                 throw new KeyNotFoundException($"Не найден элемент");
             }
-            fieldElemUpdate.elem_id = newElem.elem_id;
+            fieldElemUpdate.ElemId = newElem.Id;
+
+            userUpdate.Gold += fieldElemUpdate.Elem.Cost;
             return await db.SaveChangesAsync();
         }
         else{

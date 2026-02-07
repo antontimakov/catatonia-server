@@ -12,10 +12,15 @@ namespace CatatoniaServer.Modules.MainField.Controllers;
 public class FillFieldController : ControllerBase
 {
     private readonly FillFieldService fillFieldService;
+    private readonly ILogger<FillFieldController> logger;
 
-    public FillFieldController(FillFieldService fillFieldServicePar)
+    public FillFieldController(
+        FillFieldService fillFieldServicePar,
+        ILogger<FillFieldController> loggerPar
+    )
     {
         fillFieldService = fillFieldServicePar;
+        logger = loggerPar;
     }
 
     // POST api/FillField/index
@@ -44,6 +49,9 @@ public class FillFieldController : ControllerBase
     [HttpPost("update")]
     public async Task<IActionResult> update([FromBody] FillFieldRequest request)
     {
+
+        // Логируем входящий запрос
+        logger.LogInformation("Получен запрос на обновление: {RequestData}", System.Text.Json.JsonSerializer.Serialize(request));
         if (request == null){
             return BadRequest("Некорректные данные");
         }

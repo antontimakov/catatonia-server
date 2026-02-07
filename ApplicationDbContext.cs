@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext
 {
-    public DbSet<ElemModel> elem { get; set; }
-    public DbSet<FieldModel> field { get; set; }
-    public DbSet<FieldElemModel> field_elem { get; set; }
-    public DbSet<UserModel> user { get; set; }
+    public DbSet<ElemModel> Elem { get; set; }
+    public DbSet<FieldModel> Field { get; set; }
+    public DbSet<FieldElemModel> FieldElem { get; set; }
+    public DbSet<UserModel> User { get; set; }
     
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -15,18 +15,47 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Настройка связей между таблицами
-        //modelBuilder.Entity<Field_elem>()
-        //    .HasKey(fe => new { fe.field_id, fe.elem_id, fe.x, fe.y, fe.field_order});
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            // Таблицы в snake_case
+            entity.SetTableName(ToSnakeCase(entity.GetTableName()));
+            
+            // Колонки в snake_case
+            foreach (var property in entity.GetProperties())
+            {
+                property.SetColumnName(ToSnakeCase(property.Name));
+            }
+            
+            // Ключи в snake_case
+            foreach (var key in entity.GetKeys())
+            {
+                key.SetName(ToSnakeCase(key.GetName()));
+            }
+            
+            // Индексы в snake_case
+            foreach (var index in entity.GetIndexes())
+            {
+                index.SetDatabaseName(ToSnakeCase(index.GetDatabaseName()));
+            }
+        }
 
         modelBuilder.Entity<FieldElemModel>()
-            .HasOne(fe => fe.field)
-            .WithMany(f => f.field_elems)
-            .HasForeignKey(fe => fe.field_id);
+            .HasOne(fe => fe.Field)
+            .WithMany(f => f.FieldElems)
+            .HasForeignKey(fe => fe.FieldId);
 
         modelBuilder.Entity<FieldElemModel>()
-            .HasOne(fe => fe.elem)
-            .WithMany(e => e.field_elems)
-            .HasForeignKey(fe => fe.elem_id);
+            .HasOne(fe => fe.Elem)
+            .WithMany(e => e.FieldElems)
+            .HasForeignKey(fe => fe.ElemId);
+    }
+
+    private string ToSnakeCase(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        
+        return string.Concat(input.Select((x, i) => 
+            i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString()))
+            .ToLower();
     }
 }

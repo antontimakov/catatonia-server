@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 //using System.ComponentModel.DataAnnotations;
 using CatatoniaServer.Modules.MainField.Services;
 using CatatoniaServer.Modules.MainField.Repositories;
@@ -23,6 +24,14 @@ builder.Services.AddScoped<UserRepository>();
 // Добавляем Swagger (только для разработки)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+        return new BadRequestObjectResult(new { message = "Ошибка валидации", errors });
+    };
+});
 
 var app = builder.Build();
 

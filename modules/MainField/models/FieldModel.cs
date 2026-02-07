@@ -5,7 +5,7 @@ namespace CatatoniaServer.Modules.MainField.Models;
 public class FieldModel
 {
     [Key]
-    public int field_id { get; set; }
-    public string? field_name { get; set; }
-    public ICollection<FieldElemModel>? field_elems { get; set; }
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public ICollection<FieldElemModel>? FieldElems { get; set; }
 }
